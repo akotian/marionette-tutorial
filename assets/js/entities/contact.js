@@ -4,11 +4,14 @@ ContactManager.module("Entities", function(
    Entities.Contact = Backbone.Model.extend({
      urlRoot: "contacts"
    });
+   Entities.configureStorage("ContactManager.Entities.Contact");
+
    Entities.ContactCollection = Backbone.Collection.extend({
      url: "contacts",
      model: Entities.Contact,
      comparator: "firstName"
    });
+   Entities.configureStorage("ContactManager.Entities.ContactCollection");
 
    var contacts;
 
@@ -33,11 +36,16 @@ ContactManager.module("Entities", function(
               phoneNumber: "777-666-7876"
             },
        ])
+       contacts.forEach(function(contact) {
+         contact.save();
+       });
    };
    var API = {
      getContactEntities : function() {
-       if (contacts === undefined) {
-         initializeContacts();
+       var contacts = new Entities.ContactCollection();
+       contacts.fetch();
+       if (contacts.length == 0)
+         return initializeContacts();
        }
        return contacts;
      }
