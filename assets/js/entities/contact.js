@@ -44,13 +44,31 @@ ContactManager.module("Entities", function(
      getContactEntities : function() {
        var contacts = new Entities.ContactCollection();
        contacts.fetch();
-       if (contacts.length == 0)
+       if (contacts.length === 0) {
          return initializeContacts();
        }
        return contacts;
+     },
+     getContactEntity: function(id) {
+       var contact = new Entities.Contact({'id':id})
+       var defer = $.Deferred();
+       setTimeout(function(){
+         contact.fetch({
+           success: function(data) {
+             defer.resolve(data);
+           },
+           error: function(data) {
+             defer.resolve(undefined);
+           }
+         });
+       }, 2000);
+       return defer.promise();
      }
    };
   ContactManager.reqres.setHandler("contact:entities", function() {
     return API.getContactEntities();
+  });
+  ContactManager.reqres.setHandler("contact:entity", function(id) {
+    return API.getContactEntity(id);
   });
 });
